@@ -66,8 +66,7 @@ public class ChartController {
     @Resource
     private RedisLimiterManager redisLimiterManager;
 
-    @Resource
-    private RedisTemplate redisTemplate;
+
 
     @Resource
     private ThreadPoolExecutor threadPoolExecutor;
