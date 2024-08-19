@@ -1,3 +1,4 @@
+use bi;
 INSERT INTO t_di_bind_device (id, user_id, mac_id, mac_type, channel_id, bind, created, modified)
 VALUES
     (1, '13500000001', '4650000000008886', 'ZNIPC', '34500000000000080', 1, '2023-12-13 00:00:03.0', '2023-12-13 00:00:03.0'),

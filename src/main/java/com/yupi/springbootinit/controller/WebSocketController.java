@@ -22,7 +22,6 @@ public class WebSocketController {
     @GetMapping("/login")
     public String login(String userId, HttpServletRequest request) {
         HttpSession httpSesion = request.getSession();
-
         System.out.println("cookie中的JESESSIONID: " + request.getCookies()[1].getValue());
         System.out.println("request中的SESSIONID: " +  request.getSession().getId());
         LOGGER.info("创建新的httpSession={}", request.getSession().getId());

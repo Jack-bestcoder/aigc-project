@@ -6,5 +6,5 @@ public interface BiMqConstant {
 
     String BI_QUEUE_NAME = "bi_queue";
 
-    String BI_ROUTING_KEY = "bi_routingKey";
+    String BI_ROUTING_KEY = "bi_sql_generate_consumer";
 }

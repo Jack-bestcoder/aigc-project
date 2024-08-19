@@ -1,12 +1,14 @@
 package com.yupi.springbootinit.controller;
 
 
+import com.yupi.springbootinit.bizmq.BiMessageProducer;
 import com.yupi.springbootinit.common.BaseResponse;
 import com.yupi.springbootinit.common.ErrorCode;
 import com.yupi.springbootinit.common.ResultUtils;
 import com.yupi.springbootinit.exception.BusinessException;
 import com.yupi.springbootinit.exception.ThrowUtils;
 import com.yupi.springbootinit.model.dto.chart.ChartAddRequest;
+import com.yupi.springbootinit.model.dto.interaction.GetSqlByPromptRequest;
 import com.yupi.springbootinit.model.dto.interaction.SqlExecuteRequest;
 import com.yupi.springbootinit.model.entity.Chart;
 import com.yupi.springbootinit.model.entity.User;
@@ -31,6 +33,9 @@ public class InteractionController {
     @Resource
     SqlExecuteService sqlExecuteService;
 
+    @Resource
+    BiMessageProducer biMessageProducer;
+
     @PostMapping("/executeSql")
     public BaseResponse<List<Map<String, Object>>> executeSql(@RequestBody SqlExecuteRequest sqlExecuteRequest, HttpServletRequest request) throws Exception {
         try {
@@ -53,4 +58,9 @@ public class InteractionController {
         }
     }
 
+    @PostMapping("/getSqlByPrompt")
+    public BaseResponse<String> getSqlByPrompt(@RequestBody GetSqlByPromptRequest getSqlByPromptRequest, HttpServletRequest request) throws Exception {
+        biMessageProducer.sendMessage(getSqlByPromptRequest.getPrompt());
+        return new BaseResponse<>(500, "请求成功，稍后查看", "正在进行sql生成");
+    }
 }

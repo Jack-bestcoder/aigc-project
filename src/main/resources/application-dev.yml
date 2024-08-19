@@ -9,23 +9,23 @@ spring:
       suffix: .html
   # 数据库配置
   rabbitmq:
-    host: localhost
+    host: 172.17.0.4
     port: 5672
     username: admin
     password: 123456
     virtual-host: /
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:33060/bi
+    url: jdbc:mysql://172.17.0.3:3306/bi
     username: root
     password: 123456
   # Redis 配置
   redis:
-    database: 1
-    host: localhost
-    port: 32124
+    host: 172.17.0.5
+    port: 6379
     timeout: 5000
     password: 123456
+    database: 0
   # 文件上传
   servlet:
     multipart:

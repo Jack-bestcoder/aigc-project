@@ -18,6 +18,7 @@
     <properties>
         <java.version>1.8</java.version>
     </properties>
+
     <dependencies>
 
         <dependency>
@@ -40,7 +41,7 @@
         <dependency>
             <groupId>org.redisson</groupId>
             <artifactId>redisson</artifactId>
-            <version>3.21.3</version>
+            <version>3.17.6</version>
         </dependency>
         <dependency>
             <groupId>com.yucongming</groupId>
@@ -174,13 +175,50 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.spotify</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>1.2.2</version>
+                <executions>
+                    <!--执行mvn package,即执行 mvn clean package docker:build-->
+                    <execution>
+                        <id>build-image</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
                 <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
+                    <!-- 镜像名称 -->
+                    <imageName>${project.artifactId}</imageName>
+                    <!-- 指定标签 -->
+                    <imageTags>
+                        <imageTag>latest</imageTag>
+                    </imageTags>
+                    <!-- 基础镜像-->
+                    <baseImage>openjdk:8-jdk-alpine</baseImage>
+
+                    <!-- 切换到容器工作目录-->
+                    <workdir>/ROOT</workdir>
+
+                    <entryPoint>["java","-jar","${project.build.finalName}.jar"]</entryPoint>
+
+                    <!-- 指定远程 Docker API地址  -->
+                    <dockerHost>http://120.76.47.158:2375</dockerHost>
+
+                    <!-- 复制 jar包到docker容器指定目录-->
+                    <resources>
+                        <resource>
+                            <targetPath>/ROOT</targetPath>
+                            <!-- 用于指定需要复制的根目录，${project.build.directory}表示target目录 -->
+                            <directory>${project.build.directory}</directory>
+                            <!-- 用于指定需要复制的文件，${project.build.finalName}.jar就是打包后的target目录下的jar包名称　-->
+                            <include>${project.build.finalName}.jar</include>
+                        </resource>
+                    </resources>
                 </configuration>
             </plugin>
         </plugins>
