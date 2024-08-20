@@ -3,7 +3,8 @@ package com.yupi.springbootinit.model.dto.interaction;
 import lombok.Data;
 
 @Data
-public class GetSqlByPromptRequest {
-    private String prompt;
+public class GetUserQueryByUserIdWithPageReq {
     private long userId;
+    private long cursor;
+    private int num;
 }

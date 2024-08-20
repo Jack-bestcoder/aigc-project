@@ -12,9 +12,7 @@ import org.springframework.stereotype.Service;
 * @createDate 2024-03-27 17:23:54
 */
 @Service
-public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart>
-    implements ChartService{
-
+public class ChartServiceImpl extends ServiceImpl<ChartMapper, Chart> implements ChartService{
 }
 
 

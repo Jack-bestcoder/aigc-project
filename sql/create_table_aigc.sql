@@ -62,3 +62,22 @@ CREATE TABLE t_mobile_surveillance_events (
                                               created TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '该条记录的创建时间',
                                               modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '该条记录的修改时间'
 );
+
+CREATE TABLE user_query (
+                            id INT AUTO_INCREMENT PRIMARY KEY,
+                            user_id INT NOT NULL,
+                            prompt VARCHAR(255) NOT NULL,
+                            generate_sql DATETIME NOT NULL,
+                            create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+                            update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE user_account (
+                              user_id INT AUTO_INCREMENT PRIMARY KEY,
+                              username VARCHAR(50) NOT NULL UNIQUE,
+                              password VARCHAR(255) NOT NULL,
+                              email VARCHAR(100) UNIQUE,
+                              register_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+                              last_login_time DATETIME DEFAULT NULL,
+                              is_active BOOLEAN DEFAULT TRUE
+);

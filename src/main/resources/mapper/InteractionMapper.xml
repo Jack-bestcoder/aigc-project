@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yupi.springbootinit.mapper.InteractionMapper">
+
+    <resultMap id="BaseResultMap" type="com.yupi.springbootinit.model.entity.UserQuery">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="userId" column="user_id" jdbcType="BIGINT"/>
+        <result property="prompt" column="prompt" jdbcType="VARCHAR"/>
+        <result property="generateSql" column="generate_sql" jdbcType="VARCHAR"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="status" column="status" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, user_id, prompt,
+        generate_sql, create_time,
+        update_time, status
+    </sql>
+
+    <select id="selectUserQueryByUserIdWithCursor" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM bi.u_user_query
+        WHERE
+        user_id = #{userId, jdbcType = BIGINT} and
+        id > #{cursor, jdbcType = BIGINT}
+        ORDER BY id DESC
+        LIMIT #{num, jdbcType=INTEGER}
+    </select>
+</mapper>

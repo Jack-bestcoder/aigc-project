@@ -1,5 +1,6 @@
 package com.yupi.springbootinit;
 
+import com.yupi.springbootinit.mapper.InteractionMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -16,14 +17,12 @@ import java.util.PriorityQueue;
 @RunWith(SpringRunner.class)    // 固定写法
 @SpringBootTest(classes = MainApplication.class)    // SpringBoot启动类（自定义的）
 public class MainApplicationTests {
-
     @Resource
-    private RabbitTemplate rabbitTemplate;  // 注入一个RabbitMQ的模板对象，操作消息队列的对象
-
+    InteractionMapper interactionMapper;
 
     // 发送一条点对点（Direct）的消息，又称为直连
     @Test
-    public void sendQueue() {
-
+    public void mapperTest() {
+        System.out.println(interactionMapper.selectUserQueryByUserIdWithCursor(1, 0, 1));
     }
 }
