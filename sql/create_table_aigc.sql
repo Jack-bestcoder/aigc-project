@@ -1,7 +1,35 @@
 -- 创建库
 create database if not exists bi;
 
+-- 切换库
 use bi;
+
+-- 用户表
+create table if not exists u_user
+(
+    id           bigint auto_increment comment 'id' primary key,
+    userAccount  varchar(256)                           not null comment '账号',
+    userPassword varchar(512)                           not null comment '密码',
+    userName     varchar(256)                           null comment '用户昵称',
+    userAvatar   varchar(1024)                          null comment '用户头像',
+    userRole     varchar(256) default 'user'            not null comment '用户角色：user/admin',
+    createTime   datetime     default CURRENT_TIMESTAMP not null comment '创建时间',
+    updateTime   datetime     default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',
+    isDelete     tinyint      default 0                 not null comment '是否删除',
+    index idx_userAccount (userAccount)
+) comment '用户' collate = utf8mb4_unicode_ci;
+
+create table u_user_query
+(
+    id           bigint auto_increment
+        primary key,
+    user_id      bigint                              not null,
+    prompt       varchar(255)                        not null,
+    generate_sql varchar(255)                        null,
+    create_time  datetime  default CURRENT_TIMESTAMP null,
+    update_time  timestamp default CURRENT_TIMESTAMP null on update CURRENT_TIMESTAMP,
+    status       int       default 0                 null comment 'AIGC任务执行状态'
+);
 
 # 创表语句
 CREATE TABLE t_di_bind_device (
@@ -63,21 +91,4 @@ CREATE TABLE t_mobile_surveillance_events (
                                               modified TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '该条记录的修改时间'
 );
 
-CREATE TABLE user_query (
-                            id INT AUTO_INCREMENT PRIMARY KEY,
-                            user_id INT NOT NULL,
-                            prompt VARCHAR(255) NOT NULL,
-                            generate_sql DATETIME NOT NULL,
-                            create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-                            update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
 
-CREATE TABLE user_account (
-                              user_id INT AUTO_INCREMENT PRIMARY KEY,
-                              username VARCHAR(50) NOT NULL UNIQUE,
-                              password VARCHAR(255) NOT NULL,
-                              email VARCHAR(100) UNIQUE,
-                              register_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-                              last_login_time DATETIME DEFAULT NULL,
-                              is_active BOOLEAN DEFAULT TRUE
-);
