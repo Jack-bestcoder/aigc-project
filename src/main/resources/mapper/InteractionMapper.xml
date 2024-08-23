@@ -23,8 +23,8 @@
         <include refid="Base_Column_List"/>
         FROM bi.u_user_query
         WHERE
-        user_id = #{userId, jdbcType = BIGINT} and
-        id > #{cursor, jdbcType = BIGINT}
+        user_id = #{userId, jdbcType = BIGINT}
+        and id > #{cursor, jdbcType = BIGINT}
         ORDER BY id DESC
         LIMIT #{num, jdbcType=INTEGER}
     </select>

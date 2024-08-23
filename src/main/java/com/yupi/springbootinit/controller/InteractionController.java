@@ -84,6 +84,7 @@ public class InteractionController {
             return new BaseResponse<>(200, "AIGC任务请求成功，结果稍后查看", "正在进行sql生成");
         } catch (Exception e) {
             log.error("请求失败");
+            log.error(e.getMessage());
             return new BaseResponse<>(500, "请求失败");
         }
     }
@@ -100,6 +101,7 @@ public class InteractionController {
             return new BaseResponse<>(200, userQueryList, "查询成功");
         } catch (Exception e) {
             log.error("获取失败");
+            log.info(e.getMessage());
             return new BaseResponse<>(50001, Collections.emptyList(), "操作失败");
         }
     }
