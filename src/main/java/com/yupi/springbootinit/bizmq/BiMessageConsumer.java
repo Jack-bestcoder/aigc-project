@@ -25,13 +25,8 @@ import javax.annotation.Resource;
 public class BiMessageConsumer {
 
     @Resource
-    private ChartService chartService;
-
-    @Resource
     private InteractionService interactionService;
 
-    @Resource
-    private AiManager aiManager;
 
     // 监听update_sql消息队列中的任务
     @SneakyThrows
@@ -55,104 +50,7 @@ public class BiMessageConsumer {
         // 更新数据库
         interactionService.updateUserQuery(updateRequest);
 
-
         // 消息确认
         channel.basicAck(deliveryTag, false);
     }
-
-    // 监听BI_QUEUE_NAMES消息队列中的任务
-//    @SneakyThrows
-//    @RabbitListener(queues = {BiMqConstant.BI_QUEUE_NAME}, ackMode = "MANUAL")
-//    public void receiveMessage(String message, Channel channel, @Header(AmqpHeaders.DELIVERY_TAG) long deliveryTag) {
-//        // 打印获取的消息
-//        log.info("receiveMessage message = {}", message);
-//        // 检测消息是否为空
-//        if (StringUtils.isBlank(message)) {
-//            // 拒绝消费这条消息
-//            channel.basicNack(deliveryTag, false, false);
-//            throw new BusinessException(ErrorCode.SYSTEM_ERROR, "消息为空");
-//        }
-//        // 获取图表ID
-//        long chartId = Long.parseLong(message);
-//        // 查询图表信息
-//        Chart chart = chartService.getById(chartId);
-//        // 如果图表为空
-//        if (chart == null) {
-//            channel.basicNack(deliveryTag, false, false);
-//            throw new BusinessException(ErrorCode.NOT_FOUND_ERROR, "图表为空");
-//        }
-//        // 先修改图表任务状态为 “执行中”。等执行成功后，修改为 “已完成”、保存执行结果；执行失败后，状态修改为 “失败”，记录任务失败信息。
-//        Chart updateChart = new Chart();
-//        updateChart.setId(chart.getId());
-//        updateChart.setStatus("running");
-//        // 更新图表通过ID
-//        boolean b = chartService.updateById(updateChart);
-//        // 如果更新失败
-//        if (!b) {
-//            channel.basicNack(deliveryTag, false, false);
-//            handleChartUpdateError(chart.getId(), "更新图表执行中状态失败");
-//            return;
-//        }
-//        // 调用 AI
-//        String result = aiManager.doChat(CommonConstant.BI_MODEL_ID, buildUserInput(chart));
-//        String[] splits = result.split("【【【【【");
-//        if (splits.length < 3) {
-//            channel.basicNack(deliveryTag, false, false);
-//            handleChartUpdateError(chart.getId(), "AI 生成错误");
-//            return;
-//        }
-//        // 设置更新结果
-//        String genChart = splits[1].trim().replaceAll("'", "\"").replaceAll("\"\\s+\"", "\"\"");
-//        String genResult = splits[2].trim();
-//        Chart updateChartResult = new Chart();
-//        updateChartResult.setId(chart.getId());
-//        updateChartResult.setGenChart(genChart);
-//        updateChartResult.setGenResult(genResult);
-//        // todo 建议定义状态为枚举值
-//        updateChartResult.setStatus("succeed");
-//        boolean updateResult = chartService.updateById(updateChartResult);
-//        if (!updateResult) {
-//            channel.basicNack(deliveryTag, false, false);
-//            handleChartUpdateError(chart.getId(), "更新图表成功状态失败");
-//        }
-//        // 消息确认
-//        channel.basicAck(deliveryTag, false);
-//    }
-//
-//    /**
-//     * 构建用户输入
-//     * @param chart
-//     * @return
-//     */
-//    private String buildUserInput(Chart chart) {
-//        String goal = chart.getGoal();
-//        String chartType = chart.getChartType();
-//        String csvData = chart.getChartData();
-//
-//        // 构造用户输入
-//        StringBuilder userInput = new StringBuilder();
-//        userInput.append("分析需求：").append("\n");
-//
-//        // 拼接分析目标
-//        String userGoal = goal;
-//        if (StringUtils.isNotBlank(chartType)) {
-//            userGoal += "，请使用" + chartType;
-//        }
-//        userInput.append(userGoal).append("\n");
-//        userInput.append("原始数据：").append("\n");
-//        userInput.append(csvData).append("\n");
-//        return userInput.toString();
-//    }
-//
-//    private void handleChartUpdateError(long chartId, String execMessage) {
-//        Chart updateChartResult = new Chart();
-//        updateChartResult.setId(chartId);
-//        updateChartResult.setStatus("failed");
-//        updateChartResult.setExecMessage("execMessage");
-//        boolean updateResult = chartService.updateById(updateChartResult);
-//        if (!updateResult) {
-//            log.error("更新图表失败状态失败" + chartId + "," + execMessage);
-//        }
-//    }
-
 }
