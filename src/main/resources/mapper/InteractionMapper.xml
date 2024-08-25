@@ -28,4 +28,30 @@
         ORDER BY id DESC
         LIMIT #{num, jdbcType=INTEGER}
     </select>
+
+    <select id="selectUserQueryById" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM bi.u_user_query
+        WHERE
+        id = #{id, jdbcType = BIGINT}
+    </select>
+
+    <select id="selectUserQueryWithPageNum" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM bi.u_user_query
+        WHERE
+        user_id = #{userId, jdbcType = BIGINT}
+        order by id desc
+        limit #{offset, jdbcType = INTEGER}, #{num, jdbcType=INTEGER}
+    </select>
+
+    <select id="countUserQueryByUserId" resultType="int">
+        SELECT
+        count(*)
+        FROM bi.u_user_query
+        WHERE
+        user_id = #{userId, jdbcType = BIGINT}
+    </select>
 </mapper>

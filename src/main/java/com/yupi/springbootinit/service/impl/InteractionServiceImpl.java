@@ -4,6 +4,7 @@ import com.yupi.springbootinit.mapper.InteractionMapper;
 import com.yupi.springbootinit.model.dto.interaction.UpdateRequest;
 import com.yupi.springbootinit.model.entity.UserQuery;
 import com.yupi.springbootinit.service.InteractionService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
@@ -34,6 +35,24 @@ public class InteractionServiceImpl implements InteractionService {
                 Map<String, Object> createTableStatement = result.get(0);
                 String createTableSql = (String) createTableStatement.get("Create Table");
                 createTableSqlList.add(createTableSql);
+            }
+        });
+        return String.join("\n", createTableSqlList);
+    }
+
+    @Override
+    public String getBusinessCreateTableSqlByDbName(String dbName) {
+        List<String> tableNameList = interactionMapper.selectAllTableNamesByDbName(dbName);
+        List<String> createTableSqlList = new ArrayList<>(Collections.emptyList());
+        tableNameList.forEach(tableName -> {
+            if (!tableName.equals("u_user_query") && !tableName.equals("u_user")) {
+                String sql = "SHOW CREATE TABLE " + dbName + "." + tableName;
+                List<Map<String, Object>> result = interactionMapper.executeSql(sql);
+                if (!result.isEmpty()) {
+                    Map<String, Object> createTableStatement = result.get(0);
+                    String createTableSql = (String) createTableStatement.get("Create Table");
+                    createTableSqlList.add(createTableSql);
+                }
             }
         });
         return String.join("\n", createTableSqlList);
@@ -107,7 +126,26 @@ public class InteractionServiceImpl implements InteractionService {
     }
 
     @Override
+    public List<UserQuery> selectUserQueryWithPageNum(long userId, int offset, int num) {
+        List<UserQuery> userQueryList =  interactionMapper.selectUserQueryWithPageNum(userId, offset, num);
+        if (ObjectUtils.isEmpty(userQueryList)) {
+            return Collections.emptyList();
+        }
+        return userQueryList;
+    }
+
+    @Override
     public void updateUserQuery(UpdateRequest updateRequest) {
         interactionMapper.updateGenerateSqlById(updateRequest.getId(), updateRequest.getGenerateSql());
+    }
+
+    @Override
+    public UserQuery getUserQueryById(long id) {
+        return interactionMapper.selectUserQueryById(id);
+    }
+
+    @Override
+    public int countUserQueryByUserId(long userId) {
+        return interactionMapper.countUserQueryByUserId(userId);
     }
 }

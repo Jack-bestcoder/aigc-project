@@ -4,16 +4,16 @@ package com.yupi.springbootinit.controller;
 import cn.hutool.json.JSONUtil;
 import com.yupi.springbootinit.bizmq.BiMessageProducer;
 import com.yupi.springbootinit.common.BaseResponse;
+import com.yupi.springbootinit.common.ErrorCode;
+import com.yupi.springbootinit.exception.BusinessException;
 import com.yupi.springbootinit.model.dto.interaction.*;
 import com.yupi.springbootinit.model.entity.UserQuery;
 import com.yupi.springbootinit.service.InteractionService;
 import com.yupi.springbootinit.service.SqlExecuteService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -58,7 +58,7 @@ public class InteractionController {
 
     @PostMapping("/getSqlByPrompt")
     @Transactional
-    public BaseResponse<String> getSqlByPrompt(@RequestBody GetSqlByPromptRequest getSqlByPromptRequest, HttpServletRequest request) throws Exception {
+    public BaseResponse<Long> getSqlByPrompt(@RequestBody GetSqlByPromptRequest getSqlByPromptRequest, HttpServletRequest request) throws Exception {
         try {
             // 查建表语句
             String createTableSqlList = promptConstant.getTABLE_STRUCTURE();
@@ -76,16 +76,15 @@ public class InteractionController {
             userQuery.setPrompt(prompt);
             interactionService.insertUserQuery(userQuery);
             sqlGeneration.setId(userQuery.getId());
-            System.out.println(userQuery.getId());
             // 发消息异步执行
-            // 使用hutool的JSON工具类将对象转换为JSON字符串
             String jsonRequest = JSONUtil.toJsonStr(sqlGeneration);
             biMessageProducer.sendMessage(jsonRequest);
-            return new BaseResponse<>(200, "AIGC任务请求成功，结果稍后查看", "正在进行sql生成");
+            long id = userQuery.getId();
+            return new BaseResponse<>(200, id, "AIGC任务请求成功，结果稍后查看");
         } catch (Exception e) {
             log.error("请求失败");
             log.error(e.getMessage());
-            return new BaseResponse<>(500, "请求失败");
+            return new BaseResponse<>(500, null,"请求失败");
         }
     }
 
@@ -102,7 +101,40 @@ public class InteractionController {
         } catch (Exception e) {
             log.error("获取失败");
             log.info(e.getMessage());
-            return new BaseResponse<>(50001, Collections.emptyList(), "操作失败");
+            return new BaseResponse<>(ErrorCode.OPERATION_ERROR.getCode(), Collections.emptyList(), "操作失败");
         }
+    }
+
+    @PostMapping("/getUserQueryByPageNum")
+    public BaseResponse<GetUserQueryByPageNumResp> getUserQueryByPageNum(@RequestBody GetUserQueryWithPageNum req, HttpServletRequest request) throws Exception {
+        long userId = req.getUseId();
+        int pageNum = req.getPageNum();
+        int pageSize = req.getPageSize();
+        if (pageSize <= 0) throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        if (pageNum <= 0) throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        if (userId <= 0) throw new BusinessException(ErrorCode.PARAMS_ERROR);
+        List<UserQuery> userQueryList = interactionService.selectUserQueryWithPageNum(userId, (pageNum - 1) * pageSize, pageSize);
+        int total = interactionService.countUserQueryByUserId(userId);
+        return new BaseResponse<>(200, new GetUserQueryByPageNumResp(userQueryList, total), "查询成功");
+    }
+
+
+    @PostMapping("/getUserQueryById")
+    public BaseResponse<UserQuery> getUserQueryById(@RequestBody GetUserQueryByIdReq req, HttpServletRequest request) throws Exception {
+        try {
+            if (req.getId() <= 0) return new BaseResponse<>(ErrorCode.PARAMS_ERROR.getCode(), null,"id不允许小于等于0");
+            UserQuery userQuery = interactionService.getUserQueryById(req.getId());
+            if (ObjectUtils.isEmpty(userQuery)) return new BaseResponse<>(ErrorCode.NOT_FOUND_ERROR.getCode(), null,"id不存在");
+            return new BaseResponse<>(ErrorCode.SUCCESS.getCode(), userQuery,"查询成功");
+        } catch (Exception e) {
+            log.error("查询失败, {}", request);
+            log.info(e.getMessage());
+            return new BaseResponse<>(ErrorCode.OPERATION_ERROR.getCode(),null, "操作失败");
+        }
+    }
+
+    @PostMapping("/getBusinessTableCreateSql")
+    public BaseResponse<String> getBusinessTableCreateSql(HttpServletRequest request) {
+        return new BaseResponse<>(ErrorCode.SUCCESS.getCode(), promptConstant.getBUSINESS_TABLE_STRUCTURE(),"查询成功");
     }
 }
