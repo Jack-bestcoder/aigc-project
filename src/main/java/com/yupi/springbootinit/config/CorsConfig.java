@@ -19,7 +19,7 @@
                         // 允许发送 Cookie
                         .allowCredentials(true)
                         // 放行哪些域名（必须用 patterns，否则 * 会和 allowCredentials 冲突）
-                        .allowedOriginPatterns("http://120.76.47.158:8200")
+                        .allowedOriginPatterns("http://120.76.47.158:8200","http://47.121.31.131:80")
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
                         .allowedHeaders("*")
                         .exposedHeaders("*");
